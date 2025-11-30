@@ -146,9 +146,7 @@ python3 --version
 pip3 --version
 git --version
 ```
-
 ---
-
 ### Step 2: Install Docker and Docker Compose
 ```bash
 # Download Docker installation script
@@ -201,8 +199,10 @@ mkdir -p docs \
 ```
 ---
 ### Step 4: Set Up Infrastructure with Docker Compose
-
-#### 4.1 Create Docker Compose Configuration
+```bash
+nano docker-compose.yml
+```
+### 4.1 Create Docker Compose Configuration
 
 Create `docker-compose.yml` in your project root:
 ```yaml
@@ -268,13 +268,6 @@ volumes:
 ```
 
 ---
-
-
-
-### Step 5: Configuration files
-```bash
-nano docker-compose.yml
-```
 
 #### 4.2 Create Virtual Environment
 ```bash
