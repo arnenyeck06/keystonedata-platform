@@ -265,6 +265,53 @@ volumes:
   cassandra_data:
   zookeeper_data:
 ```
+---
+#### Requirements.txt
+```bash
+nano requirements.txt
+```
+### Copy and paste Docker Compose Configuration below
+
+create requirements, copy and paste below:
+```txt
+# Database drivers
+psycopg2-binary==2.9.9
+cassandra-driver==3.29.1
+
+# Kafka (modern client)
+confluent-kafka==2.3.0
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.2
+
+# Machine Learning
+scikit-learn==1.3.2
+xgboost==2.0.3
+imbalanced-learn==0.11.0
+
+# NLP
+nltk==3.8.1
+textblob==0.17.1
+
+# API
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.2
+
+# Dashboard
+streamlit==1.29.0
+plotly==5.18.0
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+joblib==1.3.2
+
+
+
+```
+
 
 ---
 
