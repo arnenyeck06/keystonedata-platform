@@ -353,7 +353,7 @@ volumes:
 # Clone the Keystone Data Solutions project
 cd ~
 git clone https://github.com/keystone-data-solutions/churn-prediction-platform.git
-cd churn-prediction-platform
+cd...
 ```
 ### 4.2.1 Instead of cloning, you can manually create directories
 ```bash
@@ -366,6 +366,10 @@ mkdir -p docs \
          dashboard \
          tests \
          vm-setup
+```
+### Step 5: Configuration files
+```bash
+nano docker-compose.yml
 ```
 
 #### 4.2 Create Virtual Environment
