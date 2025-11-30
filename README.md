@@ -355,6 +355,18 @@ cd ~
 git clone https://github.com/keystone-data-solutions/churn-prediction-platform.git
 cd churn-prediction-platform
 ```
+### 4.2.1 Instead of cloning, you can manually create directories
+```bash
+mkdir -p docs \                                                     
+         data/raw \
+         data/processed \
+         data/models \
+         notebooks \
+         src \
+         dashboard \
+         tests \
+         vm-setup
+```
 
 #### 4.2 Create Virtual Environment
 ```bash
