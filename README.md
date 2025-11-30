@@ -308,11 +308,27 @@ joblib==1.3.0
 python-dotenv==1.0.0
 requests==2.31.0
 ```
+---
+### 5.1 Create .gitignore
+```bash
+nano .gitignore
+```
+---
+### Step 6: Starting Docker services
+```bash
+# Start all services (first time will download images - takes 3-5 minutes)
+docker compose up -d
 
+# Wait for services to initialize
+sleep 30
 
+# Verify all services are running
+docker compose ps
 
-
-#### 4.2 Create Virtual Environment
+# Expected output: 4 containers (postgres, cassandra, kafka, zookeeper) with status "Up"
+```
+---
+### Step 7: Create Virtual Environment
 ```bash
 # Create virtual environment
 python3 -m venv venv
@@ -322,8 +338,13 @@ source venv/bin/activate
 
 # Upgrade pip
 pip install --upgrade pip
-```
+# pip install -r requirements.txt
 
+# Verify packages
+pip list | grep -E "pandas|scikit-learn|fastapi|streamlit|cassandra"
+
+```
+### CONTINUE HERE
 #### 4.3 Install Python Packages
 ```bash
 # Install all dependencies
