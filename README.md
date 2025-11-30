@@ -184,7 +184,6 @@ cd ~
 git clone https://github.com/keystone-data-solutions/churn-prediction-platform.git
 cd...
 ```
----
 ###  Instead of cloning, you can manually create directories
 ```bash
 mkdir -p docs \                                                     
