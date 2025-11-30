@@ -272,7 +272,7 @@ nano requirements.txt
 ```
 ```bash
 
-## copy and paste the requirements below:
+### Copy and paste requirements below
 
 # Data Processing
 pandas==2.0.0
