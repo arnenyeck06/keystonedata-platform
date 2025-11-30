@@ -231,42 +231,48 @@ The goal of Keystone Data Solutions is to provide a real-time Customer Churn Pre
 
 #### 1.1 Update System
 ```bash
-# Update package list
-sudo apt update && sudo apt upgrade -y
-
-# Install essential build tools
-sudo apt install -y build-essential git wget curl vim
+sudo apt update
+sudo apt upgrade -y
 ```
 
 #### 1.2 Install Python 3 and pip
 ```bash
-# Install Python 3 and development tools
-sudo apt install -y python3 python3-pip python3-dev python3-venv
+# Install Python, pip, venv, and git
+sudo apt install python3-pip python3-venv git wget -y
 
-# Verify installation
+# Verify installations
 python3 --version
 pip3 --version
+git --version
 ```
 
 ---
 
 ### Step 2: Install Docker and Docker Compose
 ```bash
-# Install Docker
-sudo apt install -y docker.io docker-compose
+# Download Docker installation script
+curl -fsSL https://get.docker.com -o get-docker.sh
 
-# Start Docker service
-sudo systemctl start docker
-sudo systemctl enable docker
+# Run Docker installation
+sudo sh get-docker.sh
 
 # Add user to docker group
 sudo usermod -aG docker $USER
 
-# Verify installation
-docker --version
-docker-compose --version
+# Activate group membership
+newgrp docker
 
-# Log out and log back in for group changes to take effect
+# Verify Docker installation
+docker --version
+
+# Remove old docker-compose (if exists)
+sudo apt remove docker-compose -y
+
+# Install Docker Compose plugin
+sudo apt install docker-compose-plugin -y
+
+# Verify Docker Compose
+docker compose version
 ```
 
 ---
