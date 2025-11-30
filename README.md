@@ -202,7 +202,7 @@ mkdir -p docs \
 ```bash
 nano docker-compose.yml
 ```
-### 4.1 Create Docker Compose Configuration
+### Copy and paste Docker Compose Configuration below
 
 Create `docker-compose.yml` in your project root:
 ```yaml
