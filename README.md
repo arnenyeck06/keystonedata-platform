@@ -266,28 +266,15 @@ volumes:
   zookeeper_data:
 ```
 ---
-#### 4.2 Create Virtual Environment
-```bash
-# Create virtual environment
-python3 -m venv venv
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Upgrade pip
-pip install --upgrade pip
-```
-
-#### 4.3 Install Python Packages
-```bash
-# Install all dependencies
-pip install -r requirements.txt
-```
 
 ```bash
-#### nano requirements.txt
-**requirements.txt:**
+### nano requirements.txt
+
+```bash
+nano requirements.txt
 ```
+## copy and paste the requirements below:
+
 # Data Processing
 pandas==2.0.0
 numpy==1.24.0
@@ -323,6 +310,27 @@ pydantic==2.5.0
 joblib==1.3.0
 python-dotenv==1.0.0
 requests==2.31.0
+```
+
+
+
+
+#### 4.2 Create Virtual Environment
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
+```
+
+#### 4.3 Install Python Packages
+```bash
+# Install all dependencies
+pip install -r requirements.txt
 ```
 
 ---
