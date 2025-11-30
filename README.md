@@ -276,10 +276,19 @@ docker compose version
 ```
 
 ---
+### Step 3: Clone Repository and Install Python Dependencies
 
-### Step 3: Set Up Infrastructure with Docker Compose
+#### 3.1 Clone Repository
+```bash
+# Clone the Keystone Data Solutions project
+cd ~
+git clone https://github.com/keystone-data-solutions/churn-prediction-platform.git
+cd...
+```
+---
+### Step 4: Set Up Infrastructure with Docker Compose
 
-#### 3.1 Create Docker Compose Configuration
+#### 4.1 Create Docker Compose Configuration
 
 Create `docker-compose.yml` in your project root:
 ```yaml
@@ -346,15 +355,7 @@ volumes:
 
 ---
 
-### Step 4: Clone Repository and Install Python Dependencies
 
-#### 4.1 Clone Repository
-```bash
-# Clone the Keystone Data Solutions project
-cd ~
-git clone https://github.com/keystone-data-solutions/churn-prediction-platform.git
-cd...
-```
 ### 4.2.1 Instead of cloning, you can manually create directories
 ```bash
 mkdir -p docs \                                                     
