@@ -2,14 +2,6 @@
 
 **Keystone Data Solutions**
 
-## Team Members
-- Victor Emma-Wele
-- Amanda Eng
-- Kavaughn Munnings
-- Arne Nyeck Nyeck
-
----
-
 ## Table of Contents
 1. [Description of the Problem](#description-of-the-problem)
 2. [Platform Architecture](#platform-architecture)
