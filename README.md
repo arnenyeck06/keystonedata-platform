@@ -187,6 +187,19 @@ git clone https://github.com/keystone-data-solutions/churn-prediction-platform.g
 cd...
 ```
 ---
+###  Instead of cloning, you can manually create directories
+```bash
+mkdir -p docs \                                                     
+         data/raw \
+         data/processed \
+         data/models \
+         notebooks \
+         src \
+         dashboard \
+         tests \
+         vm-setup
+```
+---
 ### Step 4: Set Up Infrastructure with Docker Compose
 
 #### 4.1 Create Docker Compose Configuration
@@ -257,18 +270,7 @@ volumes:
 ---
 
 
-### 4.2.1 Instead of cloning, you can manually create directories
-```bash
-mkdir -p docs \                                                     
-         data/raw \
-         data/processed \
-         data/models \
-         notebooks \
-         src \
-         dashboard \
-         tests \
-         vm-setup
-```
+
 ### Step 5: Configuration files
 ```bash
 nano docker-compose.yml
