@@ -266,13 +266,12 @@ volumes:
   zookeeper_data:
 ```
 ---
-
-```bash
-### nano requirements.txt
-
+### Step 4: Set Up Infrastructure with Docker Compose
 ```bash
 nano requirements.txt
 ```
+```bash
+
 ## copy and paste the requirements below:
 
 # Data Processing
