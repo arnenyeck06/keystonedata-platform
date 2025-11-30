@@ -286,52 +286,35 @@ Create `docker-compose.yml` in your project root:
 version: '3.8'
 
 services:
-  # PostgreSQL - Structured Data
   postgres:
-    image: postgres:15
-    container_name: postgres-churn
+    image: postgres:14
+    container_name: churn-postgres
     environment:
-      POSTGRES_USER: keystonedata
-      POSTGRES_PASSWORD: keystonedata2024
+      POSTGRES_USER: churn_user
+      POSTGRES_PASSWORD: churn_pass
       POSTGRES_DB: churn_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - keystone-network
+    restart: unless-stopped
 
-  # Cassandra - Unstructured/Time-Series Data
   cassandra:
     image: cassandra:4.1
-    container_name: cassandra-churn
+    container_name: churn-cassandra
     ports:
       - "9042:9042"
     environment:
-      - CASSANDRA_CLUSTER_NAME=KeystoneCluster
+      CASSANDRA_CLUSTER_NAME: ChurnCluster
+      CASSANDRA_DC: dc1
+      CASSANDRA_RACK: rack1
     volumes:
       - cassandra_data:/var/lib/cassandra
-    networks:
-      - keystone-network
+    restart: unless-stopped
 
-  # Zookeeper (for Kafka)
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    networks:
-      - keystone-network
-
-  # Kafka - Real-time Streaming
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: kafka-churn
-    depends_on:
-      - zookeeper
+    container_name: churn-kafka
     ports:
       - "9092:9092"
     environment:
@@ -339,28 +322,26 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    networks:
-      - keystone-network
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: churn-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   cassandra_data:
-
-networks:
-  keystone-network:
-    driver: bridge
-```
-
-#### 3.2 Start All Services
-```bash
-# Start all services
-docker-compose up -d
-
-# Verify all containers are running
-docker ps
-
-# Check logs
-docker-compose logs -f
+  zookeeper_data:
 ```
 
 ---
