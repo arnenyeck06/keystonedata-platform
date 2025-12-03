@@ -313,6 +313,47 @@ requests==2.31.0
 ```bash
 nano .gitignore
 ```
+# copy and paste file below:
+```bash
+# -------------------------
+# PYTHON
+# -------------------------
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+venv/
+env/
+ENV/
+
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Typing / Testing
+.mypy_cache/
+.pytest_cache/
+
+# -------------------------
+# NOTEBOOKS
+# -------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+*.ipynb_autosave
+
+# -------------------------
+# DATA FILES
+# -------------------------
+data/raw/*
+data/processed/*
+data/models/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/models/.gitkeep
+```
 ---
 ### Step 6: Starting Docker services
 ```bash
@@ -325,7 +366,7 @@ sleep 30
 # Verify all services are running
 docker compose ps
 
-# Expected output: 4 containers (postgres, cassandra, kafka, zookeeper) with status "Up"
+# Output: 4 containers (postgres, cassandra, kafka, zookeeper) with status "Up"
 ```
 ---
 ### Step 7: Create Virtual Environment
@@ -344,328 +385,79 @@ pip install --upgrade pip
 pip list | grep -E "pandas|scikit-learn|fastapi|streamlit|cassandra"
 
 ```
-### CONTINUE HERE
-#### 4.3 Install Python Packages
-```bash
-# Install all dependencies
-pip install -r requirements.txt
-```
+---
+### Step 8: Download Dataset
 
+```bash
+Download IBM Telco Customer Churn dataset        
+wget -O data/raw/telco_churn.csv https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+
+# Verify the download
+ls -lh data/raw/
+wc -l data/raw/telco_churn.csv
+# Output: ~7044 lines (7043 customers + 1 header)
+```
 ---
 
-### Step 5: Initialize Databases
-
-#### 5.1 PostgreSQL Setup
+### Step 9: Create Database Scripts
 ```bash
-# Connect to PostgreSQL
-docker exec -it postgres-churn psql -U keystonedata -d churn_db
-
-# Create tables (SQL)
-CREATE TABLE customers (
-    customer_id VARCHAR(50) PRIMARY KEY,
-    gender VARCHAR(10),
-    senior_citizen INTEGER,
-    partner VARCHAR(5),
-    dependents VARCHAR(5),
-    tenure INTEGER,
-    phone_service VARCHAR(5),
-    paperless_billing VARCHAR(5),
-    monthly_charges DECIMAL(10,2),
-    total_charges DECIMAL(10,2),
-    churn VARCHAR(5),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-# Exit
-\q
+nano src/db_postgres.py
 ```
-
-#### 5.2 Cassandra Setup
+# Create Cassandra handler
 ```bash
-# Connect to Cassandra
-docker exec -it cassandra-churn cqlsh
-
-# Create keyspace
-CREATE KEYSPACE IF NOT EXISTS churn_events
-WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-
-# Create table
-CREATE TABLE churn_events.customer_events (
-    customer_id text,
-    event_timestamp timestamp,
-    event_type text,
-    event_data map<text, text>,
-    PRIMARY KEY (customer_id, event_timestamp)
-) WITH CLUSTERING ORDER BY (event_timestamp DESC);
-
-# Exit
-exit
+nano src/db_cassandra.py
 ```
-
+# Create Data ingestion file
+```bash
+nano src/ingest.py
+```
 ---
-
-### Step 6: Verify Installation
+### Step 10: Database initialization
 ```bash
-# Check Python packages
-pip list
+# Test PostgreSQL connection
+python src/db_postgres.py --test
+# Output: ✓ Connected to PostgreSQL
+
+# Initialize PostgreSQL schema
+python src/db_postgres.py --init
+# Output: ✓ Table 'customers' created
+
+# Test Cassandra connection
+python src/db_cassandra.py --test
+# Output: ✓ Connected to Cassandra
+
+# Initialize Cassandra schema
+python src/db_cassandra.py --init
+# Output: ✓ Keyspace and tables created
+```
+---
+### Step 11: Load Data
+```bash
+# Load customer data into PostgreSQL
+python src/ingest.py --batch data/raw/telco_churn.csv
+# Output: ✓ Inserted 7043 customers into PostgreSQL
+
+# Generate sample events in Cassandra
+python src/ingest.py --events 100
+# Output: ✓ Inserted 100 events into Cassandra
+
+# Generate sample support tickets in Cassandra
+python src/ingest.py --tickets 50
+# Output: ✓ Inserted 50 support tickets into Cassandra
+```
+---
+### Step 12: Test and Verify
+```bash
+# Check all Docker containers are running
+docker compose ps
 
 # Test database connections
-python3 -c "import psycopg2; print('PostgreSQL connector OK')"
-python3 -c "from cassandra.cluster import Cluster; print('Cassandra connector OK')"
-python3 -c "from kafka import KafkaProducer; print('Kafka connector OK')"
+python src/db_postgres.py --test
+python src/db_cassandra.py --test
 
-# Test ML libraries
-python3 -c "import xgboost; print('XGBoost OK')"
-python3 -c "from sklearn.svm import SVC; print('Scikit-learn OK')"
-
-# Start Jupyter Notebook
-jupyter notebook
+# Check data loaded
+# (We'll add query scripts later)
 ```
-
----
-
-## Running the Project
-
-### Option 1: Using Jupyter Notebooks (Recommended for Development)
-```bash
-# Navigate to project directory
-cd ~/churn-prediction-platform
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Start Jupyter Notebook
-jupyter notebook
-
-# Open notebooks in order:
-# 1. notebooks/01_data_analysis.ipynb
-# 2. notebooks/02_model_training.ipynb
-```
-
----
-
-### Option 2: Running FastAPI Backend
-```bash
-# Navigate to src directory
-cd ~/churn-prediction-platform
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Run FastAPI server
-uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
-
-# API will be available at:
-# - API: http://localhost:8000
-# - Docs: http://localhost:8000/docs
-# - ReDoc: http://localhost:8000/redoc
-```
-
-**Example FastAPI endpoints:**
-```
-GET  /health              - Health check
-POST /predict             - Single prediction
-POST /batch-predict       - Batch predictions
-GET  /model-metrics       - Model performance metrics
-GET  /feature-importance  - Feature importance scores
-```
-
----
-
-### Option 3: Running Streamlit Dashboard
-```bash
-# Navigate to project directory
-cd ~/churn-prediction-platform
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Run Streamlit dashboard
-streamlit run src/dashboard/app.py
-
-# Dashboard will open automatically at:
-# http://localhost:8501
-```
-
-**Dashboard Features:**
-- Real-time churn predictions
-- Customer risk segmentation
-- Model performance metrics
-- Interactive visualizations
-- Feature importance analysis
-- Historical trends
-
----
-
-### Option 4: Running Complete Pipeline
-```bash
-# Run end-to-end pipeline
-python3 src/pipeline.py
-
-# Or run specific components
-python3 src/data/ingest_data.py
-python3 src/preprocessing/clean_data.py
-python3 src/models/train_models.py
-python3 src/models/evaluate_models.py
-```
-
----
-
-## Project Structure
-```
-churn-prediction-platform/
-├── README.md
-├── requirements.txt
-├── docker-compose.yml
-├── .env
-├── .gitignore
-│
-├── data/
-│   ├── raw/                    # Original CSV/JSON files
-│   ├── processed/              # Cleaned data
-│   └── predictions/            # Model outputs
-│
-├── notebooks/
-│   ├── 01_data_analysis.ipynb
-│   └── 02_model_training.ipynb
-│
-├── src/
-│   ├── __init__.py
-│   │
-│   ├── data/
-│   │   ├── __init__.py
-│   │   ├── ingest_postgres.py
-│   │   ├── ingest_cassandra.py
-│   │   └── kafka_producer.py
-│   │
-│   ├── preprocessing/
-│   │   ├── __init__.py
-│   │   ├── clean_data.py
-│   │   └── feature_engineering.py
-│   │
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── train_xgboost.py
-│   │   ├── train_svm.py
-│   │   ├── train_logistic.py
-│   │   └── evaluate.py
-│   │
-│   ├── api/
-│   │   ├── __init__.py
-│   │   ├── main.py              # FastAPI app
-│   │   ├── routes.py
-│   │   ├── schemas.py
-│   │   └── models.py
-│   │
-│   ├── dashboard/
-│   │   ├── __init__.py
-│   │   └── app.py               # Streamlit dashboard
-│   │
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   ├── database.py
-│   │   ├── logger.py
-│   │   └── config.py
-│   │
-│   └── pipeline.py              # End-to-end pipeline
-│
-├── models/
-│   ├── xgboost_model.pkl
-│   ├── svm_model.pkl
-│   ├── logistic_model.pkl
-│   └── scaler.pkl
-│
-├── config/
-│   ├── database.yaml
-│   └── model_config.yaml
-│
-├── tests/
-│   ├── test_data.py
-│   ├── test_models.py
-│   └── test_api.py
-│
-└── docs/
-    ├── architecture.md
-    ├── api_documentation.md
-    └── business_requirements.md
-```
-
----
-
-## Model Performance
-
-### Comparison of ML Models
-
-| Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC | Training Time |
-|-------|----------|-----------|--------|----------|---------|---------------|
-| **XGBoost** | 0.82 | 0.68 | 0.75 | 0.71 | 0.87 | 15s |
-| SVM (SMOTE) | 0.79 | 0.56 | 0.73 | 0.63 | 0.84 | 45s |
-| Logistic Reg | 0.81 | 0.65 | 0.72 | 0.68 | 0.85 | 8s |
-
-**✅ Keystone Data Solutions Recommendation**: **XGBoost** for production deployment
-
-### Key Features for Churn Prediction
-1. **Tenure** (months with company)
-2. **Monthly Charges**
-3. **Contract Type**
-4. **Total Charges**
-5. **Payment Method**
-
----
-
-## API Usage Examples
-
-### Using cURL
-```bash
-# Health check
-curl http://localhost:8000/health
-
-# Single prediction
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "tenure": 12,
-    "monthly_charges": 70.5,
-    "total_charges": 846.0,
-    "contract_type": "Month-to-month",
-    "payment_method": "Electronic check"
-  }'
-
-# Batch prediction
-curl -X POST http://localhost:8000/batch-predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customers": [
-      {"tenure": 12, "monthly_charges": 70.5, ...},
-      {"tenure": 24, "monthly_charges": 85.0, ...}
-    ]
-  }'
-```
-
-### Using Python
-```python
-import requests
-
-# API endpoint
-url = "http://localhost:8000/predict"
-
-# Customer data
-customer = {
-    "tenure": 12,
-    "monthly_charges": 70.5,
-    "total_charges": 846.0,
-    "contract_type": "Month-to-month",
-    "payment_method": "Electronic check"
-}
-
-# Make prediction
-response = requests.post(url, json=customer)
-result = response.json()
-
-print(f"Churn Probability: {result['churn_probability']:.2%}")
-print(f"Risk Level: {result['risk_level']}")
-```
-
 ---
 
 ## Troubleshooting
